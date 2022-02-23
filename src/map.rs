@@ -25,7 +25,7 @@ impl Map {
     pub fn render(&self, ctx: &mut BTerm) {
         for y in 0..SCREEN_HEIGHT {
             for x in 0..SCREEN_WIDTH {
-                let index = position_to_index(x, y);
+                let index = coordinate_to_index(x, y);
 
                 match self.tiles[index] {
                     TileType::Floor => ctx.set(x, y, YELLOW, BLACK, to_cp437('.')),
@@ -36,6 +36,10 @@ impl Map {
     }
 }
 
-pub fn position_to_index(x: i32, y: i32) -> usize {
+pub fn coordinate_to_index(x: i32, y: i32) -> usize {
     ((y * SCREEN_WIDTH) + x) as usize
+}
+
+pub fn point_within_bounds(point: Point) -> bool {
+    (point.x >= 0 && point.x < SCREEN_WIDTH) && (point.y >= 0 && point.y < SCREEN_HEIGHT)
 }
