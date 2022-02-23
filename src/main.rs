@@ -1,12 +1,15 @@
 use bracket_lib::prelude::*;
 
-use crate::map::Map;
+use crate::map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use crate::map_builder::MapBuilder;
 use crate::player::Player;
 
 mod map;
 mod map_builder;
 mod player;
+
+const DISPLAY_HEIGHT: i32 = MAP_HEIGHT / 2;
+const DISPLAY_WIDTH: i32 = MAP_WIDTH / 2;
 
 struct State {
     map: Map,
@@ -37,9 +40,15 @@ impl GameState for State {
 }
 
 fn main() -> BError {
-    let context = BTermBuilder::simple80x50()
+    let context = BTermBuilder::new()
         .with_title("Dungeon Crawler")
         .with_fps_cap(30.0)
+        .with_dimensions(DISPLAY_WIDTH, DISPLAY_HEIGHT)
+        .with_tile_dimensions(32, 32)
+        .with_resource_path("resources/")
+        .with_font("dungeonfont.png", 32, 32)
+        .with_simple_console(DISPLAY_WIDTH, DISPLAY_HEIGHT, "dungeonfont.png")
+        .with_simple_console_no_bg(DISPLAY_WIDTH, DISPLAY_HEIGHT, "dungeonfont.png")
         .build()?;
 
     main_loop(context, State::new())
