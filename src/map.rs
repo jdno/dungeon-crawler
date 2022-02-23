@@ -40,6 +40,18 @@ pub fn coordinate_to_index(x: i32, y: i32) -> usize {
     ((y * SCREEN_WIDTH) + x) as usize
 }
 
+pub fn point_to_index(point: Point) -> usize {
+    coordinate_to_index(point.x, point.y)
+}
+
+pub fn try_point_to_index(point: Point) -> Option<usize> {
+    if point_within_bounds(point) {
+        Some(point_to_index(point))
+    } else {
+        None
+    }
+}
+
 pub fn point_within_bounds(point: Point) -> bool {
     (point.x >= 0 && point.x < SCREEN_WIDTH) && (point.y >= 0 && point.y < SCREEN_HEIGHT)
 }
