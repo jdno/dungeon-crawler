@@ -2,8 +2,7 @@ use std::cmp::{max, min};
 
 use bracket_lib::prelude::*;
 
-use crate::map::{point_to_index, try_point_to_index, TileType};
-use crate::{Map, SCREEN_HEIGHT, SCREEN_WIDTH};
+use crate::map::{point_to_index, try_point_to_index, Map, TileType, MAP_HEIGHT, MAP_WIDTH};
 
 const NUM_ROOMS: usize = 20;
 
@@ -36,8 +35,8 @@ impl MapBuilder {
     fn generate_random_rooms(&mut self, rng: &mut RandomNumberGenerator) {
         while self.rooms.len() < NUM_ROOMS {
             let room = Rect::with_size(
-                rng.range(1, SCREEN_WIDTH - 10),
-                rng.range(1, SCREEN_HEIGHT - 10),
+                rng.range(1, MAP_WIDTH - 10),
+                rng.range(1, MAP_HEIGHT - 10),
                 rng.range(2, 10),
                 rng.range(2, 10),
             );
@@ -53,7 +52,7 @@ impl MapBuilder {
 
             if !overlap {
                 room.for_each(|r| {
-                    if (r.x > 0 && r.x < SCREEN_WIDTH) && (r.y > 0 && r.y < SCREEN_HEIGHT) {
+                    if (r.x > 0 && r.x < MAP_WIDTH) && (r.y > 0 && r.y < MAP_HEIGHT) {
                         let index = point_to_index(r);
                         self.map.tiles[index] = TileType::Floor;
                     }

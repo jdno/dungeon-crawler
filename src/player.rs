@@ -1,6 +1,7 @@
 use bracket_lib::prelude::*;
 
-use crate::Map;
+use crate::camera::Camera;
+use crate::map::Map;
 
 pub struct Player {
     pub position: Point,
@@ -11,17 +12,19 @@ impl Player {
         Self { position }
     }
 
-    pub fn render(&self, ctx: &mut BTerm) {
+    pub fn render(&self, ctx: &mut BTerm, camera: &Camera) {
+        ctx.set_active_console(1);
+
         ctx.set(
-            self.position.x,
-            self.position.y,
+            self.position.x - camera.viewport.x1,
+            self.position.y - camera.viewport.y1,
             WHITE,
             BLACK,
             to_cp437('@'),
         );
     }
 
-    pub fn update(&mut self, ctx: &mut BTerm, map: &Map) {
+    pub fn update(&mut self, ctx: &mut BTerm, map: &Map, camera: &mut Camera) {
         if let Some(key) = ctx.key {
             let delta = match key {
                 VirtualKeyCode::Left => Point::new(-1, 0),
@@ -35,6 +38,7 @@ impl Player {
 
             if map.is_enterable_tile(next_position) {
                 self.position = next_position;
+                camera.on_player_move(next_position);
             }
         }
     }
