@@ -1,6 +1,8 @@
+use std::cmp::{max, min};
+
 use bracket_lib::prelude::*;
 
-use crate::map::{point_to_index, TileType};
+use crate::map::{point_to_index, try_point_to_index, TileType};
 use crate::{Map, SCREEN_HEIGHT, SCREEN_WIDTH};
 
 const NUM_ROOMS: usize = 20;
@@ -43,6 +45,41 @@ impl MapBuilder {
                 });
 
                 self.rooms.push(room);
+            }
+        }
+    }
+
+    fn connect_rooms_with_corridors(&mut self, rng: &mut RandomNumberGenerator) {
+        let mut rooms = self.rooms.clone();
+
+        rooms.sort_by(|a, b| a.center().x.cmp(&b.center().x));
+
+        for (i, room) in rooms.iter().enumerate().skip(1) {
+            let previous = rooms[i - 1].center();
+            let next = room.center();
+
+            if rng.range(0, 2) == 1 {
+                self.build_horizontal_tunnel(previous.x, next.x, previous.y);
+                self.build_vertical_tunnel(next.x, previous.y, next.y);
+            } else {
+                self.build_vertical_tunnel(previous.x, previous.y, next.y);
+                self.build_horizontal_tunnel(previous.x, next.x, next.y);
+            }
+        }
+    }
+
+    fn build_horizontal_tunnel(&mut self, start: i32, end: i32, y: i32) {
+        for x in min(start, end)..=max(start, end) {
+            if let Some(index) = try_point_to_index(Point::new(x, y)) {
+                self.map.tiles[index as usize] = TileType::Floor;
+            }
+        }
+    }
+
+    fn build_vertical_tunnel(&mut self, x: i32, start: i32, end: i32) {
+        for y in min(start, end)..=max(start, end) {
+            if let Some(index) = try_point_to_index(Point::new(x, y)) {
+                self.map.tiles[index as usize] = TileType::Floor;
             }
         }
     }
