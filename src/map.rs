@@ -48,6 +48,7 @@ pub fn point_to_index(point: Point) -> usize {
     coordinate_to_index(point.x, point.y)
 }
 
+#[allow(dead_code)] // TODO: Remove once the function is used
 pub fn try_point_to_index(point: Point) -> Option<usize> {
     if point_within_bounds(point) {
         Some(point_to_index(point))
