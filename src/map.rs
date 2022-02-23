@@ -1,8 +1,8 @@
 use bracket_lib::prelude::*;
 
-use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
-
-const NUM_TILES: usize = (SCREEN_WIDTH * SCREEN_HEIGHT) as usize;
+pub const MAP_HEIGHT: i32 = 50;
+pub const MAP_WIDTH: i32 = 80;
+const NUM_TILES: usize = (MAP_WIDTH * MAP_HEIGHT) as usize;
 
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum TileType {
@@ -26,8 +26,8 @@ impl Map {
     }
 
     pub fn render(&self, ctx: &mut BTerm) {
-        for y in 0..SCREEN_HEIGHT {
-            for x in 0..SCREEN_WIDTH {
+        for y in 0..MAP_HEIGHT {
+            for x in 0..MAP_WIDTH {
                 let index = coordinate_to_index(x, y);
 
                 match self.tiles[index] {
@@ -40,7 +40,7 @@ impl Map {
 }
 
 pub fn coordinate_to_index(x: i32, y: i32) -> usize {
-    ((y * SCREEN_WIDTH) + x) as usize
+    ((y * MAP_WIDTH) + x) as usize
 }
 
 pub fn point_to_index(point: Point) -> usize {
@@ -56,5 +56,5 @@ pub fn try_point_to_index(point: Point) -> Option<usize> {
 }
 
 pub fn point_within_bounds(point: Point) -> bool {
-    (point.x >= 0 && point.x < SCREEN_WIDTH) && (point.y >= 0 && point.y < SCREEN_HEIGHT)
+    (point.x >= 0 && point.x < MAP_WIDTH) && (point.y >= 0 && point.y < MAP_HEIGHT)
 }
