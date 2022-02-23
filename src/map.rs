@@ -19,3 +19,7 @@ impl Map {
         }
     }
 }
+
+pub fn position_to_index(x: i32, y: i32) -> usize {
+    ((y * SCREEN_WIDTH) + x) as usize
+}
