@@ -22,6 +22,10 @@ impl Map {
         }
     }
 
+    pub fn is_enterable_tile(&self, point: Point) -> bool {
+        point_within_bounds(point) && self.tiles[point_to_index(point)] == TileType::Floor
+    }
+
     pub fn render(&self, ctx: &mut BTerm) {
         for y in 0..SCREEN_HEIGHT {
             for x in 0..SCREEN_WIDTH {
