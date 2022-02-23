@@ -4,6 +4,7 @@ use crate::map::Map;
 use crate::player::Player;
 
 mod map;
+mod map_builder;
 mod player;
 
 const SCREEN_HEIGHT: i32 = 50;
