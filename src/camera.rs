@@ -3,7 +3,7 @@ use bracket_lib::prelude::*;
 use crate::{DISPLAY_HEIGHT, DISPLAY_WIDTH};
 
 pub struct Camera {
-    viewport: Rect,
+    pub viewport: Rect,
 }
 
 impl Camera {
