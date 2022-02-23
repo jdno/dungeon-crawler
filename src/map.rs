@@ -39,14 +39,14 @@ impl Map {
                         TileType::Floor => ctx.set(
                             x - camera.viewport.x1,
                             y - camera.viewport.y1,
-                            YELLOW,
+                            WHITE,
                             BLACK,
                             to_cp437('.'),
                         ),
                         TileType::Wall => ctx.set(
                             x - camera.viewport.x1,
                             y - camera.viewport.y1,
-                            GREEN,
+                            WHITE,
                             BLACK,
                             to_cp437('#'),
                         ),
