@@ -1,3 +1,5 @@
+use bracket_lib::prelude::*;
+
 use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
 
 const NUM_TILES: usize = (SCREEN_WIDTH * SCREEN_HEIGHT) as usize;
@@ -16,6 +18,19 @@ impl Map {
     pub fn new() -> Self {
         Self {
             tiles: vec![TileType::Floor; NUM_TILES],
+        }
+    }
+
+    pub fn render(&self, ctx: &mut BTerm) {
+        for y in 0..SCREEN_HEIGHT {
+            for x in 0..SCREEN_WIDTH {
+                let index = position_to_index(x, y);
+
+                match self.tiles[index] {
+                    TileType::Floor => ctx.set(x, y, YELLOW, BLACK, to_cp437('.')),
+                    TileType::Wall => ctx.set(x, y, GREEN, BLACK, to_cp437('#')),
+                };
+            }
         }
     }
 }
