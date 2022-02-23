@@ -14,6 +14,21 @@ pub struct MapBuilder {
 }
 
 impl MapBuilder {
+    pub fn new(rng: &mut RandomNumberGenerator) -> Self {
+        let mut builder = Self {
+            map: Map::new(),
+            rooms: Vec::new(),
+            player_start: Point::zero(),
+        };
+
+        builder.fill(TileType::Wall);
+        builder.generate_random_rooms(rng);
+        builder.connect_rooms_with_corridors(rng);
+        builder.player_start = builder.rooms[0].center();
+
+        builder
+    }
+
     fn fill(&mut self, tile: TileType) {
         self.map.tiles.iter_mut().for_each(|t| *t = tile);
     }
