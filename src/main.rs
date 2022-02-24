@@ -4,7 +4,7 @@ use legion::{Resources, Schedule, World};
 use crate::camera::Camera;
 use crate::map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use crate::map_builder::MapBuilder;
-use crate::spawner::spawn_player;
+use crate::spawner::{spawn_monster, spawn_player};
 use crate::systems::init_scheduler;
 
 mod camera;
@@ -38,6 +38,7 @@ impl State {
         resources.insert(Camera::new(map_builder.player_start));
 
         spawn_player(&mut ecs, map_builder.player_start);
+        spawn_monsters(&mut ecs, &mut rng, map_builder.rooms);
 
         Self {
             ecs,
@@ -60,6 +61,14 @@ impl GameState for State {
 
         render_draw_buffer(ctx).expect("failed to render draw buffer");
     }
+}
+
+fn spawn_monsters(ecs: &mut World, rng: &mut RandomNumberGenerator, rooms: Vec<Rect>) {
+    rooms
+        .iter()
+        .skip(1)
+        .map(|room| room.center())
+        .for_each(|position| spawn_monster(ecs, rng, position));
 }
 
 fn main() -> BError {
