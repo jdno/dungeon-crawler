@@ -1,11 +1,11 @@
 use legion::Schedule;
 
-mod input;
-mod map_render;
+mod process_input;
+mod render_map;
 
 pub fn init_scheduler() -> Schedule {
     Schedule::builder()
-        .add_system(input::process_input_system())
-        .add_system(map_render::render_map_system())
+        .add_system(process_input::process_input_system())
+        .add_system(render_map::render_map_system())
         .build()
 }

@@ -8,7 +8,7 @@ use crate::{Camera, Map};
 #[system]
 #[read_component(Player)]
 #[write_component(Point)]
-pub fn input(
+pub fn process_input(
     ecs: &mut SubWorld,
     #[resource] map: &Map,
     #[resource] key: &Option<VirtualKeyCode>,
