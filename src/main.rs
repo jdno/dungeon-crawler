@@ -5,12 +5,14 @@ use crate::camera::Camera;
 use crate::map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use crate::map_builder::MapBuilder;
 use crate::spawner::spawn_player;
+use crate::systems::init_scheduler;
 
 mod camera;
 mod components;
 mod map;
 mod map_builder;
 mod spawner;
+mod systems;
 
 const DISPLAY_HEIGHT: i32 = MAP_HEIGHT / 2;
 const DISPLAY_WIDTH: i32 = MAP_WIDTH / 2;
@@ -49,6 +51,8 @@ impl GameState for State {
 
         ctx.set_active_console(1);
         ctx.cls();
+
+        self.systems.execute(&mut self.ecs, &mut self.resources);
     }
 }
 
