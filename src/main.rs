@@ -18,7 +18,7 @@ const DISPLAY_HEIGHT: i32 = MAP_HEIGHT / 2;
 const DISPLAY_WIDTH: i32 = MAP_WIDTH / 2;
 
 const MAP_LAYER: usize = 0;
-const ENTITY_LAYEAR: usize = 1;
+const ENTITY_LAYER: usize = 1;
 
 struct State {
     ecs: World,

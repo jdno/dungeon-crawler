@@ -2,7 +2,7 @@ use bracket_lib::prelude::*;
 
 pub const MAP_HEIGHT: i32 = 50;
 pub const MAP_WIDTH: i32 = 80;
-const NUM_TILES: usize = (MAP_WIDTH * MAP_HEIGHT) as usize;
+pub const NUM_TILES: usize = (MAP_WIDTH * MAP_HEIGHT) as usize;
 
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum TileType {
