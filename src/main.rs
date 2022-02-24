@@ -3,12 +3,10 @@ use bracket_lib::prelude::*;
 use crate::camera::Camera;
 use crate::map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use crate::map_builder::MapBuilder;
-use crate::player::Player;
 
 mod camera;
 mod map;
 mod map_builder;
-mod player;
 
 const DISPLAY_HEIGHT: i32 = MAP_HEIGHT / 2;
 const DISPLAY_WIDTH: i32 = MAP_WIDTH / 2;
@@ -16,7 +14,6 @@ const DISPLAY_WIDTH: i32 = MAP_WIDTH / 2;
 struct State {
     camera: Camera,
     map: Map,
-    player: Player,
 }
 
 impl State {
@@ -27,7 +24,6 @@ impl State {
         Self {
             camera: Camera::new(map_builder.player_start),
             map: map_builder.map,
-            player: Player::new(map_builder.player_start),
         }
     }
 }
@@ -40,10 +36,7 @@ impl GameState for State {
         ctx.set_active_console(1);
         ctx.cls();
 
-        self.player.update(ctx, &self.map, &mut self.camera);
-
         self.map.render(ctx, &self.camera);
-        self.player.render(ctx, &self.camera);
     }
 }
 
