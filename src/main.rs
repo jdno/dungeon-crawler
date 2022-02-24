@@ -1,29 +1,43 @@
 use bracket_lib::prelude::*;
+use legion::{Resources, Schedule, World};
 
 use crate::camera::Camera;
 use crate::map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use crate::map_builder::MapBuilder;
+use crate::spawner::spawn_player;
 
 mod camera;
+mod components;
 mod map;
 mod map_builder;
+mod spawner;
 
 const DISPLAY_HEIGHT: i32 = MAP_HEIGHT / 2;
 const DISPLAY_WIDTH: i32 = MAP_WIDTH / 2;
 
 struct State {
-    camera: Camera,
-    map: Map,
+    ecs: World,
+    resources: Resources,
+    systems: Schedule,
 }
 
 impl State {
     fn new() -> Self {
+        let mut ecs = World::default();
+
         let mut rng = RandomNumberGenerator::new();
         let map_builder = MapBuilder::new(&mut rng);
 
+        let mut resources = Resources::default();
+        resources.insert(map_builder.map);
+        resources.insert(Camera::new(map_builder.player_start));
+
+        spawn_player(&mut ecs, map_builder.player_start);
+
         Self {
-            camera: Camera::new(map_builder.player_start),
-            map: map_builder.map,
+            ecs,
+            resources,
+            systems: init_scheduler(),
         }
     }
 }
