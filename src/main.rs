@@ -35,8 +35,6 @@ impl GameState for State {
 
         ctx.set_active_console(1);
         ctx.cls();
-
-        self.map.render(ctx, &self.camera);
     }
 }
 

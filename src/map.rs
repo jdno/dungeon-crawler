@@ -1,7 +1,5 @@
 use bracket_lib::prelude::*;
 
-use crate::camera::Camera;
-
 pub const MAP_HEIGHT: i32 = 50;
 pub const MAP_WIDTH: i32 = 80;
 const NUM_TILES: usize = (MAP_WIDTH * MAP_HEIGHT) as usize;
@@ -25,35 +23,6 @@ impl Map {
 
     pub fn is_enterable_tile(&self, point: Point) -> bool {
         point_within_bounds(point) && self.tiles[point_to_index(point)] == TileType::Floor
-    }
-
-    pub fn render(&self, ctx: &mut BTerm, camera: &Camera) {
-        ctx.set_active_console(0);
-
-        for y in camera.viewport.y1..camera.viewport.y2 {
-            for x in camera.viewport.x1..camera.viewport.x2 {
-                if point_within_bounds(Point::new(x, y)) {
-                    let index = coordinate_to_index(x, y);
-
-                    match self.tiles[index] {
-                        TileType::Floor => ctx.set(
-                            x - camera.viewport.x1,
-                            y - camera.viewport.y1,
-                            WHITE,
-                            BLACK,
-                            to_cp437('.'),
-                        ),
-                        TileType::Wall => ctx.set(
-                            x - camera.viewport.x1,
-                            y - camera.viewport.y1,
-                            WHITE,
-                            BLACK,
-                            to_cp437('#'),
-                        ),
-                    };
-                }
-            }
-        }
     }
 }
 
