@@ -17,6 +17,9 @@ mod systems;
 const DISPLAY_HEIGHT: i32 = MAP_HEIGHT / 2;
 const DISPLAY_WIDTH: i32 = MAP_WIDTH / 2;
 
+const MAP_LAYER: usize = 0;
+const ENTITY_LAYEAR: usize = 1;
+
 struct State {
     ecs: World,
     resources: Resources,
@@ -54,6 +57,8 @@ impl GameState for State {
 
         self.resources.insert(ctx.key);
         self.systems.execute(&mut self.ecs, &mut self.resources);
+
+        render_draw_buffer(ctx).expect("failed to render draw buffer");
     }
 }
 
