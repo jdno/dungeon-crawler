@@ -8,6 +8,7 @@ mod process_input;
 mod render_entity;
 mod render_hud;
 mod render_map;
+mod render_tooltip;
 
 pub fn build_input_scheduler() -> Schedule {
     Schedule::builder()
@@ -15,6 +16,8 @@ pub fn build_input_scheduler() -> Schedule {
         .flush()
         .add_system(render_entity::render_entity_system())
         .add_system(render_map::render_map_system())
+        .add_system(render_hud::render_hud_system())
+        .add_system(render_tooltip::render_tooltip_system())
         .build()
 }
 

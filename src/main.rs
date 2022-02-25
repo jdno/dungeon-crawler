@@ -73,6 +73,9 @@ impl GameState for State {
 
         self.resources.insert(ctx.key);
 
+        ctx.set_active_console(MAP_LAYER);
+        self.resources.insert(Point::from_tuple(ctx.mouse_pos()));
+
         let system = match *self.resources.get::<TurnState>().unwrap() {
             TurnState::AwaitingInput => &mut self.input_systems,
             TurnState::PlayerTurn => &mut self.player_systems,
