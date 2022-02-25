@@ -1,5 +1,6 @@
 use legion::Schedule;
 
+mod combat;
 mod end_turn;
 mod move_entity;
 mod move_randomly;
