@@ -3,7 +3,7 @@ use legion::world::SubWorld;
 use legion::{component, system, IntoQuery};
 
 use crate::components::Player;
-use crate::{Camera, Map};
+use crate::{Camera, Map, TurnState};
 
 #[system]
 #[read_component(Player)]
@@ -13,6 +13,7 @@ pub fn process_input(
     #[resource] map: &Map,
     #[resource] key: &Option<VirtualKeyCode>,
     #[resource] camera: &mut Camera,
+    #[resource] turn_state: &mut TurnState,
 ) {
     if let Some(key) = key {
         let delta = match key {
@@ -32,6 +33,7 @@ pub fn process_input(
                 if map.is_enterable_tile(destination) {
                     *position = destination;
                     camera.on_player_move(destination);
+                    *turn_state = TurnState::PlayerTurn;
                 }
             })
         }
