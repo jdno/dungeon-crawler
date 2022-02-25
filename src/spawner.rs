@@ -1,12 +1,13 @@
 use bracket_lib::prelude::*;
 use legion::World;
 
-use crate::components::{Enemy, Player, Render};
+use crate::components::{Enemy, Player, RandomMovement, Render};
 
 pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, position: Point) {
     ecs.push((
         Enemy,
         position,
+        RandomMovement,
         Render {
             color: ColorPair::new(WHITE, BLACK),
             glyph: match rng.range(0, 4) {

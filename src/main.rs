@@ -5,7 +5,10 @@ use crate::camera::Camera;
 use crate::map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use crate::map_builder::MapBuilder;
 use crate::spawner::{spawn_monster, spawn_player};
-use crate::systems::init_scheduler;
+use crate::systems::{
+    build_input_scheduler, build_monster_turn_scheduler, build_player_turn_scheduler,
+};
+use crate::turn_state::TurnState;
 
 mod camera;
 mod components;
@@ -13,6 +16,7 @@ mod map;
 mod map_builder;
 mod spawner;
 mod systems;
+mod turn_state;
 
 const DISPLAY_HEIGHT: i32 = MAP_HEIGHT / 2;
 const DISPLAY_WIDTH: i32 = MAP_WIDTH / 2;
@@ -23,7 +27,9 @@ const ENTITY_LAYER: usize = 1;
 struct State {
     ecs: World,
     resources: Resources,
-    systems: Schedule,
+    input_systems: Schedule,
+    monster_systems: Schedule,
+    player_systems: Schedule,
 }
 
 impl State {
@@ -36,6 +42,7 @@ impl State {
         let mut resources = Resources::default();
         resources.insert(map_builder.map);
         resources.insert(Camera::new(map_builder.player_start));
+        resources.insert(TurnState::AwaitingInput);
 
         spawn_player(&mut ecs, map_builder.player_start);
         spawn_monsters(&mut ecs, &mut rng, map_builder.rooms);
@@ -43,7 +50,9 @@ impl State {
         Self {
             ecs,
             resources,
-            systems: init_scheduler(),
+            input_systems: build_input_scheduler(),
+            monster_systems: build_monster_turn_scheduler(),
+            player_systems: build_player_turn_scheduler(),
         }
     }
 }
@@ -57,7 +66,13 @@ impl GameState for State {
         ctx.cls();
 
         self.resources.insert(ctx.key);
-        self.systems.execute(&mut self.ecs, &mut self.resources);
+
+        let system = match *self.resources.get::<TurnState>().unwrap() {
+            TurnState::AwaitingInput => &mut self.input_systems,
+            TurnState::PlayerTurn => &mut self.player_systems,
+            TurnState::MonsterTurn => &mut self.monster_systems,
+        };
+        system.execute(&mut self.ecs, &mut self.resources);
 
         render_draw_buffer(ctx).expect("failed to render draw buffer");
     }
