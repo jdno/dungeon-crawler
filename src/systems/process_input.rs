@@ -3,14 +3,14 @@ use legion::systems::CommandBuffer;
 use legion::world::SubWorld;
 use legion::{component, system, Entity, IntoQuery};
 
-use crate::components::{Player, WantsToMove};
+use crate::components::{Enemy, Player, WantsToAttack, WantsToMove};
 use crate::TurnState;
 
 #[system]
 #[read_component(Player)]
 #[read_component(Point)]
 pub fn process_input(
-    ecs: &mut SubWorld,
+    ecs: &SubWorld,
     commands: &mut CommandBuffer,
     #[resource] key: &Option<VirtualKeyCode>,
     #[resource] turn_state: &mut TurnState,
@@ -24,20 +24,41 @@ pub fn process_input(
             _ => Point::zero(),
         };
 
-        <(Entity, &Point)>::query()
-            .filter(component::<Player>())
-            .iter_mut(ecs)
-            .for_each(|(entity, position)| {
-                let destination = *position + delta;
+        if delta.x != 0 || delta.y != 0 {
+            <(Entity, &Point)>::query()
+                .filter(component::<Player>())
+                .iter(ecs)
+                .for_each(|(player_entity, position)| {
+                    let destination = *position + delta;
+                    let mut has_hit_something = false;
 
-                commands.push((
-                    (),
-                    WantsToMove {
-                        entity: *entity,
-                        destination,
-                    },
-                ));
-            });
+                    <(Entity, &Point)>::query()
+                        .filter(component::<Enemy>())
+                        .iter(ecs)
+                        .filter(|(_, position)| **position == destination)
+                        .for_each(|(enemy_entity, _)| {
+                            has_hit_something = true;
+
+                            commands.push((
+                                (),
+                                WantsToAttack {
+                                    attacker: *player_entity,
+                                    victim: *enemy_entity,
+                                },
+                            ));
+                        });
+
+                    if !has_hit_something {
+                        commands.push((
+                            (),
+                            WantsToMove {
+                                entity: *player_entity,
+                                destination,
+                            },
+                        ));
+                    }
+                });
+        }
 
         *turn_state = TurnState::PlayerTurn;
     }

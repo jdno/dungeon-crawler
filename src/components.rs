@@ -26,6 +26,12 @@ pub struct Render {
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+pub struct WantsToAttack {
+    pub attacker: Entity,
+    pub victim: Entity,
+}
+
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
 pub struct WantsToMove {
     pub entity: Entity,
     pub destination: Point,
