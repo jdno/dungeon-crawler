@@ -1,20 +1,20 @@
 use bracket_lib::prelude::*;
+use legion::systems::CommandBuffer;
 use legion::world::SubWorld;
-use legion::{system, IntoQuery};
+use legion::{system, Entity, IntoQuery};
 
-use crate::components::RandomMovement;
-use crate::Map;
+use crate::components::{RandomMovement, WantsToMove};
 
 #[system]
+#[read_component(Point)]
 #[read_component(RandomMovement)]
-#[write_component(Point)]
-pub fn move_randomly(ecs: &mut SubWorld, #[resource] map: &Map) {
-    <(&mut Point, &RandomMovement)>::query()
+pub fn move_randomly(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
+    <(Entity, &Point, &RandomMovement)>::query()
         .iter_mut(ecs)
-        .for_each(|(position, _)| {
+        .for_each(|(entity, position, _)| {
             let mut rng = RandomNumberGenerator::new();
 
-            let delta = match rng.range(0, 4) {
+            let delta = match rng.range::<i32>(0, 4) {
                 0 => Point::new(-1, 0),
                 1 => Point::new(1, 0),
                 2 => Point::new(0, -1),
@@ -22,8 +22,12 @@ pub fn move_randomly(ecs: &mut SubWorld, #[resource] map: &Map) {
             };
             let destination = *position + delta;
 
-            if map.is_enterable_tile(destination) {
-                *position = destination;
-            }
+            commands.push((
+                (),
+                WantsToMove {
+                    entity: *entity,
+                    destination,
+                },
+            ));
         });
 }
