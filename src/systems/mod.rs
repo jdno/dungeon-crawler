@@ -1,6 +1,5 @@
 use legion::Schedule;
 
-mod collisions;
 mod end_turn;
 mod move_entity;
 mod move_randomly;
@@ -37,8 +36,6 @@ pub fn build_monster_turn_scheduler() -> Schedule {
 pub fn build_player_turn_scheduler() -> Schedule {
     Schedule::builder()
         .add_system(move_entity::move_entity_system())
-        .flush()
-        .add_system(collisions::collisions_system())
         .flush()
         .add_system(render_entity::render_entity_system())
         .add_system(render_map::render_map_system())
