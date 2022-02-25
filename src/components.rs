@@ -1,4 +1,5 @@
 use bracket_lib::prelude::*;
+use legion::Entity;
 
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct Enemy;
@@ -13,4 +14,10 @@ pub struct RandomMovement;
 pub struct Render {
     pub color: ColorPair,
     pub glyph: FontCharType,
+}
+
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+pub struct WantsToMove {
+    pub entity: Entity,
+    pub destination: Point,
 }
