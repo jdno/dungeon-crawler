@@ -20,9 +20,12 @@ mod turn_state;
 
 const DISPLAY_HEIGHT: i32 = MAP_HEIGHT / 2;
 const DISPLAY_WIDTH: i32 = MAP_WIDTH / 2;
+const HUD_HEIGHT: i32 = MAP_HEIGHT * 2;
+const HUD_WIDTH: i32 = MAP_WIDTH * 2;
 
 const MAP_LAYER: usize = 0;
 const ENTITY_LAYER: usize = 1;
+const HUD_LAYER: usize = 2;
 
 struct State {
     ecs: World,
@@ -59,13 +62,19 @@ impl State {
 
 impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
-        ctx.set_active_console(0);
+        ctx.set_active_console(MAP_LAYER);
         ctx.cls();
 
-        ctx.set_active_console(1);
+        ctx.set_active_console(ENTITY_LAYER);
+        ctx.cls();
+
+        ctx.set_active_console(HUD_LAYER);
         ctx.cls();
 
         self.resources.insert(ctx.key);
+
+        ctx.set_active_console(MAP_LAYER);
+        self.resources.insert(Point::from_tuple(ctx.mouse_pos()));
 
         let system = match *self.resources.get::<TurnState>().unwrap() {
             TurnState::AwaitingInput => &mut self.input_systems,
@@ -94,8 +103,10 @@ fn main() -> BError {
         .with_tile_dimensions(32, 32)
         .with_resource_path("resources/")
         .with_font("dungeonfont.png", 32, 32)
+        .with_font("terminal8x8.png", 8, 8)
         .with_simple_console(DISPLAY_WIDTH, DISPLAY_HEIGHT, "dungeonfont.png")
         .with_simple_console_no_bg(DISPLAY_WIDTH, DISPLAY_HEIGHT, "dungeonfont.png")
+        .with_simple_console_no_bg(HUD_WIDTH, HUD_HEIGHT, "terminal8x8.png")
         .build()?;
 
     main_loop(context, State::new())

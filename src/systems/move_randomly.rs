@@ -1,16 +1,18 @@
 use bracket_lib::prelude::*;
 use legion::systems::CommandBuffer;
 use legion::world::SubWorld;
-use legion::{system, Entity, IntoQuery};
+use legion::{system, Entity, EntityStore, IntoQuery};
 
-use crate::components::{RandomMovement, WantsToMove};
+use crate::components::{Health, Player, RandomMovement, WantsToAttack, WantsToMove};
 
 #[system]
+#[read_component(Health)]
+#[read_component(Player)]
 #[read_component(Point)]
 #[read_component(RandomMovement)]
 pub fn move_randomly(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
     <(Entity, &Point, &RandomMovement)>::query()
-        .iter_mut(ecs)
+        .iter(ecs)
         .for_each(|(entity, position, _)| {
             let mut rng = RandomNumberGenerator::new();
 
@@ -22,12 +24,38 @@ pub fn move_randomly(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
             };
             let destination = *position + delta;
 
-            commands.push((
-                (),
-                WantsToMove {
-                    entity: *entity,
-                    destination,
-                },
-            ));
+            let mut has_attacked = false;
+
+            <(Entity, &Point, &Health)>::query()
+                .iter(ecs)
+                .filter(|(_, target_position, _)| **target_position == destination)
+                .for_each(|(victim, _, _)| {
+                    if ecs
+                        .entry_ref(*victim)
+                        .unwrap()
+                        .get_component::<Player>()
+                        .is_ok()
+                    {
+                        commands.push((
+                            (),
+                            WantsToAttack {
+                                attacker: *entity,
+                                victim: *victim,
+                            },
+                        ));
+
+                        has_attacked = true;
+                    }
+                });
+
+            if !has_attacked {
+                commands.push((
+                    (),
+                    WantsToMove {
+                        entity: *entity,
+                        destination,
+                    },
+                ));
+            }
         });
 }
