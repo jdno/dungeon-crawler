@@ -1,7 +1,7 @@
 use bracket_lib::prelude::*;
 use legion::World;
 
-use crate::components::{Enemy, Player, RandomMovement, Render};
+use crate::components::{Enemy, Health, Player, RandomMovement, Render};
 
 pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, position: Point) {
     ecs.push((
@@ -23,6 +23,10 @@ pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, position:
 pub fn spawn_player(ecs: &mut World, position: Point) {
     ecs.push((
         Player,
+        Health {
+            current: 20,
+            max: 20,
+        },
         position,
         Render {
             color: ColorPair::new(WHITE, BLACK),
