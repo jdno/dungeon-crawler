@@ -24,14 +24,23 @@ pub fn render_map(ecs: &SubWorld, #[resource] map: &Map, #[resource] camera: &Ca
             let point = Point::new(x, y);
             let offset = Point::new(camera.viewport.x1, camera.viewport.y1);
 
-            if point_within_bounds(point) && fov.visible_tiles.contains(&point) {
-                let index = point_to_index(point);
+            let index = point_to_index(point);
+
+            if point_within_bounds(point)
+                && (fov.visible_tiles.contains(&point) || map.revealed_tiles[index])
+            {
+                let tint = if fov.visible_tiles.contains(&point) {
+                    WHITE
+                } else {
+                    DARK_GRAY
+                };
+
                 let glyph = match map.tiles[index] {
                     TileType::Floor => to_cp437('.'),
                     TileType::Wall => to_cp437('#'),
                 };
 
-                draw_batch.set(point - offset, ColorPair::new(WHITE, BLACK), glyph);
+                draw_batch.set(point - offset, ColorPair::new(tint, BLACK), glyph);
             }
         }
     }
