@@ -20,7 +20,7 @@ impl FieldOfView {
         Self {
             visible_tiles: HashSet::new(),
             radius,
-            is_dirty: false,
+            is_dirty: true,
         }
     }
 
