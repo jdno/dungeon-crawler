@@ -3,17 +3,18 @@ use legion::systems::CommandBuffer;
 use legion::world::SubWorld;
 use legion::{system, Entity, IntoQuery};
 
-use crate::components::{ChasesPlayer, Health, Player, WantsToAttack, WantsToMove};
+use crate::components::{ChasesPlayer, FieldOfView, Health, Player, WantsToAttack, WantsToMove};
 use crate::map::point_to_index;
 use crate::{Map, MAP_HEIGHT, MAP_WIDTH};
 
 #[system]
 #[read_component(ChasesPlayer)]
+#[read_component(FieldOfView)]
 #[read_component(Health)]
 #[read_component(Player)]
 #[read_component(Point)]
 pub fn chase_player(ecs: &SubWorld, commands: &mut CommandBuffer, #[resource] map: &Map) {
-    let mut chasing_monsters = <(Entity, &Point, &ChasesPlayer)>::query();
+    let mut chasing_monsters = <(Entity, &Point, &ChasesPlayer, &FieldOfView)>::query();
     let mut player = <(Entity, &Point, &Player)>::query();
 
     let (player_entity, player_position, _) = player.iter(ecs).next().unwrap();
@@ -24,7 +25,11 @@ pub fn chase_player(ecs: &SubWorld, commands: &mut CommandBuffer, #[resource] ma
 
     chasing_monsters
         .iter(ecs)
-        .for_each(|(entity, position, _)| {
+        .for_each(|(entity, position, _, fov)| {
+            if !fov.visible_tiles.contains(player_position) {
+                return;
+            }
+
             let index = point_to_index(*position);
 
             if let Some(destination) = DijkstraMap::find_lowest_exit(&dijkstra_map, index, map) {

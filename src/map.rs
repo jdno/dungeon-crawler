@@ -12,12 +12,14 @@ pub enum TileType {
 
 pub struct Map {
     pub tiles: Vec<TileType>,
+    pub revealed_tiles: Vec<bool>,
 }
 
 impl Map {
     pub fn new() -> Self {
         Self {
             tiles: vec![TileType::Floor; NUM_TILES],
+            revealed_tiles: vec![false; NUM_TILES],
         }
     }
 
@@ -48,6 +50,10 @@ impl Algorithm2D for Map {
 }
 
 impl BaseMap for Map {
+    fn is_opaque(&self, index: usize) -> bool {
+        self.tiles[index] != TileType::Floor
+    }
+
     fn get_available_exits(&self, index: usize) -> SmallVec<[(usize, f32); 10]> {
         let mut exits = SmallVec::new();
         let position = self.index_to_point2d(index);
