@@ -4,7 +4,7 @@ use legion::{Resources, Schedule, World};
 use crate::camera::Camera;
 use crate::map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use crate::map_builder::MapBuilder;
-use crate::spawner::{spawn_monster, spawn_player};
+use crate::spawner::{spawn_amulet_of_yala, spawn_monster, spawn_player};
 use crate::systems::{
     build_input_scheduler, build_monster_turn_scheduler, build_player_turn_scheduler,
 };
@@ -47,6 +47,7 @@ impl State {
         resources.insert(Camera::new(map_builder.player_start));
         resources.insert(TurnState::AwaitingInput);
 
+        spawn_amulet_of_yala(&mut ecs, map_builder.amulet_position);
         spawn_player(&mut ecs, map_builder.player_start);
         spawn_monsters(&mut ecs, &mut rng, map_builder.rooms);
 
@@ -57,6 +58,74 @@ impl State {
             monster_systems: build_monster_turn_scheduler(),
             player_systems: build_player_turn_scheduler(),
         }
+    }
+
+    fn defeat(&mut self, ctx: &mut BTerm) {
+        ctx.set_active_console(HUD_LAYER);
+
+        ctx.print_color_centered(2, RED, BLACK, "Your quest has ended.");
+        ctx.print_color_centered(
+            4,
+            WHITE,
+            BLACK,
+            "Slain by a monster, your hero's journey has come to a premature end",
+        );
+        ctx.print_color_centered(
+            5,
+            WHITE,
+            BLACK,
+            "The Amulet of Yala remains unclaimed, and your home town is not saved.",
+        );
+        ctx.print_color_centered(
+            8,
+            YELLOW,
+            BLACK,
+            "Don't worry, you can always try again with a new hero.",
+        );
+        ctx.print_color_centered(9, GREEN, BLACK, "Press SPACE to play again.");
+
+        if let Some(VirtualKeyCode::Space) = ctx.key {
+            self.reset_game_state();
+        }
+    }
+
+    fn victory(&mut self, ctx: &mut BTerm) {
+        ctx.set_active_console(HUD_LAYER);
+
+        ctx.print_color_centered(2, GREEN, BLACK, "You have won!");
+        ctx.print_color_centered(
+            4,
+            WHITE,
+            BLACK,
+            "You put on the Amulet of Yala and feel ist power course through your veins.",
+        );
+        ctx.print_color_centered(
+            5,
+            WHITE,
+            BLACK,
+            "Your town is saved, and you can return to a normal life.",
+        );
+        ctx.print_color_centered(7, GREEN, BLACK, "Press SPACE to play again.");
+
+        if let Some(VirtualKeyCode::Space) = ctx.key {
+            self.reset_game_state();
+        }
+    }
+
+    fn reset_game_state(&mut self) {
+        self.ecs = World::default();
+
+        let mut rng = RandomNumberGenerator::new();
+        let map_builder = MapBuilder::new(&mut rng);
+
+        self.resources = Resources::default();
+        self.resources.insert(map_builder.map);
+        self.resources.insert(Camera::new(map_builder.player_start));
+        self.resources.insert(TurnState::AwaitingInput);
+
+        spawn_amulet_of_yala(&mut self.ecs, map_builder.amulet_position);
+        spawn_player(&mut self.ecs, map_builder.player_start);
+        spawn_monsters(&mut self.ecs, &mut rng, map_builder.rooms);
     }
 }
 
@@ -76,12 +145,21 @@ impl GameState for State {
         ctx.set_active_console(MAP_LAYER);
         self.resources.insert(Point::from_tuple(ctx.mouse_pos()));
 
-        let system = match *self.resources.get::<TurnState>().unwrap() {
-            TurnState::AwaitingInput => &mut self.input_systems,
-            TurnState::PlayerTurn => &mut self.player_systems,
-            TurnState::MonsterTurn => &mut self.monster_systems,
+        let turn_state = *self.resources.get::<TurnState>().unwrap();
+
+        match turn_state {
+            TurnState::AwaitingInput => self
+                .input_systems
+                .execute(&mut self.ecs, &mut self.resources),
+            TurnState::PlayerTurn => self
+                .player_systems
+                .execute(&mut self.ecs, &mut self.resources),
+            TurnState::MonsterTurn => self
+                .monster_systems
+                .execute(&mut self.ecs, &mut self.resources),
+            TurnState::Defeat => self.defeat(ctx),
+            TurnState::Victory => self.victory(ctx),
         };
-        system.execute(&mut self.ecs, &mut self.resources);
 
         render_draw_buffer(ctx).expect("failed to render draw buffer");
     }

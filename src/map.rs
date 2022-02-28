@@ -24,6 +24,59 @@ impl Map {
     pub fn is_enterable_tile(&self, point: Point) -> bool {
         point_within_bounds(point) && self.tiles[point_to_index(point)] == TileType::Floor
     }
+
+    pub fn is_valid_step(&self, position: Point, delta: Point) -> Option<usize> {
+        let destination = position + delta;
+
+        if point_within_bounds(destination) && self.is_enterable_tile(destination) {
+            let index = point_to_index(destination);
+            Some(index)
+        } else {
+            None
+        }
+    }
+}
+
+impl Algorithm2D for Map {
+    fn dimensions(&self) -> Point {
+        Point::new(MAP_WIDTH, MAP_HEIGHT)
+    }
+
+    fn in_bounds(&self, point: Point) -> bool {
+        point_within_bounds(point)
+    }
+}
+
+impl BaseMap for Map {
+    fn get_available_exits(&self, index: usize) -> SmallVec<[(usize, f32); 10]> {
+        let mut exits = SmallVec::new();
+        let position = self.index_to_point2d(index);
+
+        if let Some(index) = self.is_valid_step(position, Point::new(-1, 0)) {
+            exits.push((index, 1.0));
+        }
+
+        if let Some(index) = self.is_valid_step(position, Point::new(1, 0)) {
+            exits.push((index, 1.0));
+        }
+
+        if let Some(index) = self.is_valid_step(position, Point::new(0, -1)) {
+            exits.push((index, 1.0));
+        }
+
+        if let Some(index) = self.is_valid_step(position, Point::new(0, 1)) {
+            exits.push((index, 1.0));
+        }
+
+        exits
+    }
+
+    fn get_pathing_distance(&self, start: usize, destination: usize) -> f32 {
+        DistanceAlg::Pythagoras.distance2d(
+            self.index_to_point2d(start),
+            self.index_to_point2d(destination),
+        )
+    }
 }
 
 pub fn coordinate_to_index(x: i32, y: i32) -> usize {
