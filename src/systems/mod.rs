@@ -1,5 +1,6 @@
 use legion::Schedule;
 
+mod chase_player;
 mod combat;
 mod end_turn;
 mod move_entity;
@@ -24,6 +25,7 @@ pub fn build_input_scheduler() -> Schedule {
 pub fn build_monster_turn_scheduler() -> Schedule {
     Schedule::builder()
         .add_system(move_randomly::move_randomly_system())
+        .add_system(chase_player::chase_player_system())
         .flush()
         .add_system(combat::combat_system())
         .flush()
