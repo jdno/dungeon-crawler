@@ -130,7 +130,7 @@ impl GameState for State {
             TurnState::MonsterTurn => self
                 .monster_systems
                 .execute(&mut self.ecs, &mut self.resources),
-            TurnState::GameOver => self.game_over(ctx),
+            TurnState::Defeat => self.game_over(ctx),
         };
 
         render_draw_buffer(ctx).expect("failed to render draw buffer");
