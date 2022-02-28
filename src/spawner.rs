@@ -1,7 +1,7 @@
 use bracket_lib::prelude::*;
 use legion::World;
 
-use crate::components::{ChasesPlayer, Enemy, Health, Name, Player, Render};
+use crate::components::{AmuletOfYala, ChasesPlayer, Enemy, Health, Item, Name, Player, Render};
 
 type Monster = (i32, String, FontCharType);
 
@@ -11,6 +11,19 @@ fn goblin() -> Monster {
 
 fn orc() -> Monster {
     (2, "Orc".to_string(), to_cp437('o'))
+}
+
+pub fn spawn_amulet_of_yala(ecs: &mut World, position: Point) {
+    ecs.push((
+        AmuletOfYala,
+        Item,
+        Name("Amulet of Yala".to_string()),
+        position,
+        Render {
+            color: ColorPair::new(WHITE, BLACK),
+            glyph: to_cp437('|'),
+        },
+    ));
 }
 
 pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, position: Point) {

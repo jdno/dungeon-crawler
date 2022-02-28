@@ -10,6 +10,7 @@ pub struct MapBuilder {
     pub map: Map,
     pub rooms: Vec<Rect>,
     pub player_start: Point,
+    pub amulet_position: Point,
 }
 
 impl MapBuilder {
@@ -18,12 +19,33 @@ impl MapBuilder {
             map: Map::new(),
             rooms: Vec::new(),
             player_start: Point::zero(),
+            amulet_position: Point::zero(),
         };
 
         builder.fill(TileType::Wall);
         builder.generate_random_rooms(rng);
         builder.connect_rooms_with_corridors(rng);
         builder.player_start = builder.rooms[0].center();
+
+        let dijkstra_map = DijkstraMap::new(
+            MAP_WIDTH,
+            MAP_HEIGHT,
+            &[point_to_index(builder.player_start)],
+            &builder.map,
+            1024.0,
+        );
+
+        const UNREACHABLE: &f32 = &f32::MAX;
+        builder.amulet_position = builder.map.index_to_point2d(
+            dijkstra_map
+                .map
+                .iter()
+                .enumerate()
+                .filter(|(_, distance)| *distance < UNREACHABLE)
+                .max_by(|a, b| a.1.partial_cmp(b.1).unwrap())
+                .unwrap()
+                .0,
+        );
 
         builder
     }

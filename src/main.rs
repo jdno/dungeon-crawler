@@ -4,7 +4,7 @@ use legion::{Resources, Schedule, World};
 use crate::camera::Camera;
 use crate::map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use crate::map_builder::MapBuilder;
-use crate::spawner::{spawn_monster, spawn_player};
+use crate::spawner::{spawn_amulet_of_yala, spawn_monster, spawn_player};
 use crate::systems::{
     build_input_scheduler, build_monster_turn_scheduler, build_player_turn_scheduler,
 };
@@ -47,6 +47,7 @@ impl State {
         resources.insert(Camera::new(map_builder.player_start));
         resources.insert(TurnState::AwaitingInput);
 
+        spawn_amulet_of_yala(&mut ecs, map_builder.amulet_position);
         spawn_player(&mut ecs, map_builder.player_start);
         spawn_monsters(&mut ecs, &mut rng, map_builder.rooms);
 
@@ -94,6 +95,7 @@ impl State {
             self.resources.insert(Camera::new(map_builder.player_start));
             self.resources.insert(TurnState::AwaitingInput);
 
+            spawn_amulet_of_yala(&mut self.ecs, map_builder.amulet_position);
             spawn_player(&mut self.ecs, map_builder.player_start);
             spawn_monsters(&mut self.ecs, &mut rng, map_builder.rooms);
         }
