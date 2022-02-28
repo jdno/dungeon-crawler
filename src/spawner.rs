@@ -1,7 +1,7 @@
 use bracket_lib::prelude::*;
 use legion::World;
 
-use crate::components::{Enemy, Health, Name, Player, RandomMovement, Render};
+use crate::components::{ChasesPlayer, Enemy, Health, Name, Player, Render};
 
 type Monster = (i32, String, FontCharType);
 
@@ -21,13 +21,13 @@ pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, position:
 
     ecs.push((
         Enemy,
+        ChasesPlayer,
         Health {
             current: hp,
             max: hp,
         },
         Name(name),
         position,
-        RandomMovement,
         Render {
             color: ColorPair::new(WHITE, BLACK),
             glyph,
