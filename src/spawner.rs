@@ -1,7 +1,9 @@
 use bracket_lib::prelude::*;
 use legion::World;
 
-use crate::components::{AmuletOfYala, ChasesPlayer, Enemy, Health, Item, Name, Player, Render};
+use crate::components::{
+    AmuletOfYala, ChasesPlayer, Enemy, FieldOfView, Health, Item, Name, Player, Render,
+};
 
 type Monster = (i32, String, FontCharType);
 
@@ -35,6 +37,7 @@ pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, position:
     ecs.push((
         Enemy,
         ChasesPlayer,
+        FieldOfView::new(6),
         Health {
             current: hp,
             max: hp,
@@ -51,6 +54,7 @@ pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, position:
 pub fn spawn_player(ecs: &mut World, position: Point) {
     ecs.push((
         Player,
+        FieldOfView::new(8),
         Health {
             current: 10,
             max: 10,
