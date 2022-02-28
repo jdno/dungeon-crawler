@@ -39,8 +39,8 @@ pub fn spawn_player(ecs: &mut World, position: Point) {
     ecs.push((
         Player,
         Health {
-            current: 20,
-            max: 20,
+            current: 10,
+            max: 10,
         },
         position,
         Render {
