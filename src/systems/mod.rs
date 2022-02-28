@@ -3,6 +3,7 @@ use legion::Schedule;
 mod chase_player;
 mod combat;
 mod end_turn;
+mod fov;
 mod move_entity;
 mod move_randomly;
 mod process_input;
@@ -31,6 +32,8 @@ pub fn build_monster_turn_scheduler() -> Schedule {
         .flush()
         .add_system(move_entity::move_entity_system())
         .flush()
+        .add_system(fov::field_of_view_system())
+        .flush()
         .add_system(render_entity::render_entity_system())
         .add_system(render_map::render_map_system())
         .add_system(render_hud::render_hud_system())
@@ -43,6 +46,8 @@ pub fn build_player_turn_scheduler() -> Schedule {
         .add_system(combat::combat_system())
         .flush()
         .add_system(move_entity::move_entity_system())
+        .flush()
+        .add_system(fov::field_of_view_system())
         .flush()
         .add_system(render_entity::render_entity_system())
         .add_system(render_map::render_map_system())
