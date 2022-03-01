@@ -49,7 +49,7 @@ impl State {
 
         spawn_amulet_of_yala(&mut ecs, map_builder.amulet_position);
         spawn_player(&mut ecs, map_builder.player_start);
-        spawn_monsters(&mut ecs, &mut rng, map_builder.rooms);
+        spawn_monsters(&mut ecs, &mut rng, map_builder.monster_spawns);
 
         Self {
             ecs,
@@ -125,7 +125,7 @@ impl State {
 
         spawn_amulet_of_yala(&mut self.ecs, map_builder.amulet_position);
         spawn_player(&mut self.ecs, map_builder.player_start);
-        spawn_monsters(&mut self.ecs, &mut rng, map_builder.rooms);
+        spawn_monsters(&mut self.ecs, &mut rng, map_builder.monster_spawns);
     }
 }
 
@@ -165,12 +165,10 @@ impl GameState for State {
     }
 }
 
-fn spawn_monsters(ecs: &mut World, rng: &mut RandomNumberGenerator, rooms: Vec<Rect>) {
-    rooms
+fn spawn_monsters(ecs: &mut World, rng: &mut RandomNumberGenerator, spawns: Vec<Point>) {
+    spawns
         .iter()
-        .skip(1)
-        .map(|room| room.center())
-        .for_each(|position| spawn_monster(ecs, rng, position));
+        .for_each(|position| spawn_monster(ecs, rng, *position));
 }
 
 fn main() -> BError {

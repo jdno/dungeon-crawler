@@ -1,34 +1,30 @@
-use std::cmp::{max, min};
-
 use bracket_lib::prelude::*;
+use std::cmp::{max, min};
 
 use crate::map::{point_to_index, try_point_to_index, Map, TileType, MAP_HEIGHT, MAP_WIDTH};
 
+pub use self::empty::*;
+
+mod empty;
+
 const NUM_ROOMS: usize = 20;
+
+pub trait MapArchitect {
+    fn build(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder;
+}
 
 pub struct MapBuilder {
     pub map: Map,
     pub rooms: Vec<Rect>,
+    pub monster_spawns: Vec<Point>,
     pub player_start: Point,
     pub amulet_position: Point,
 }
 
 impl MapBuilder {
     pub fn new(rng: &mut RandomNumberGenerator) -> Self {
-        let mut builder = Self {
-            map: Map::new(),
-            rooms: Vec::new(),
-            player_start: Point::zero(),
-            amulet_position: Point::zero(),
-        };
-
-        builder.fill(TileType::Wall);
-        builder.generate_random_rooms(rng);
-        builder.connect_rooms_with_corridors(rng);
-        builder.player_start = builder.rooms[0].center();
-        builder.amulet_position = builder.find_most_distant_point();
-
-        builder
+        let mut architect = EmptyArchitect {};
+        architect.build(rng)
     }
 
     fn fill(&mut self, tile: TileType) {
