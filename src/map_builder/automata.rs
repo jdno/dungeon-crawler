@@ -88,6 +88,7 @@ impl MapArchitect for CellularAutomataArchitect {
 
         builder.player_start = self.find_start(&builder.map);
         builder.amulet_position = builder.find_most_distant_point();
+        builder.monster_spawns = builder.spawn_monsters(rng);
 
         builder
     }

@@ -12,6 +12,7 @@ mod automata;
 mod empty;
 mod rooms;
 
+const NUM_MONSTERS: usize = 50;
 const NUM_ROOMS: usize = 20;
 
 pub trait MapArchitect {
@@ -56,6 +57,32 @@ impl MapBuilder {
                 .unwrap()
                 .0,
         )
+    }
+
+    fn spawn_monsters(&self, rng: &mut RandomNumberGenerator) -> Vec<Point> {
+        let mut spawnable_tiles: Vec<Point> = self
+            .map
+            .tiles
+            .iter()
+            .enumerate()
+            .filter(|(index, tile)| {
+                **tile == TileType::Floor
+                    && DistanceAlg::Pythagoras
+                        .distance2d(self.player_start, self.map.index_to_point2d(*index))
+                        > 10.0
+            })
+            .map(|(index, _)| self.map.index_to_point2d(index))
+            .collect();
+
+        let mut spawns = Vec::new();
+
+        for _ in 0..NUM_MONSTERS {
+            let index = rng.random_slice_index(&spawnable_tiles).unwrap();
+            spawns.push(spawnable_tiles[index]);
+            spawnable_tiles.remove(index);
+        }
+
+        spawns
     }
 
     fn generate_random_rooms(&mut self, rng: &mut RandomNumberGenerator) {
