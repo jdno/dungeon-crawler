@@ -54,6 +54,16 @@ impl CellularAutomataArchitect {
         neighbors
     }
 
+    fn wall_map(&self, map: &mut Map) {
+        for y in 0..MAP_HEIGHT {
+            for x in 0..MAP_WIDTH {
+                if x % (MAP_WIDTH - 1) == 0 || y % (MAP_HEIGHT - 1) == 0 {
+                    map.tiles[coordinate_to_index(x, y)] = TileType::Wall;
+                }
+            }
+        }
+    }
+
     fn find_start(&self, map: &Map) -> Point {
         let center = Point::new(MAP_WIDTH / 2, MAP_HEIGHT / 2);
 
@@ -85,6 +95,8 @@ impl MapArchitect for CellularAutomataArchitect {
         for _ in 0..10 {
             self.iteration(&mut builder.map);
         }
+
+        self.wall_map(&mut builder.map);
 
         builder.player_start = self.find_start(&builder.map);
         builder.amulet_position = builder.find_most_distant_point();
