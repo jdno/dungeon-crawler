@@ -1,11 +1,14 @@
-use bracket_lib::prelude::*;
 use std::cmp::{max, min};
+
+use bracket_lib::prelude::*;
 
 use crate::map::{point_to_index, try_point_to_index, Map, TileType, MAP_HEIGHT, MAP_WIDTH};
 
 pub use self::empty::*;
+pub use self::rooms::*;
 
 mod empty;
+mod rooms;
 
 const NUM_ROOMS: usize = 20;
 
@@ -23,7 +26,7 @@ pub struct MapBuilder {
 
 impl MapBuilder {
     pub fn new(rng: &mut RandomNumberGenerator) -> Self {
-        let mut architect = EmptyArchitect {};
+        let mut architect = RoomsArchitect {};
         architect.build(rng)
     }
 
