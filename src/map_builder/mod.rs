@@ -4,9 +4,11 @@ use bracket_lib::prelude::*;
 
 use crate::map::{point_to_index, try_point_to_index, Map, TileType, MAP_HEIGHT, MAP_WIDTH};
 
+pub use self::automata::*;
 pub use self::empty::*;
 pub use self::rooms::*;
 
+mod automata;
 mod empty;
 mod rooms;
 
@@ -119,6 +121,18 @@ impl MapBuilder {
             if let Some(index) = try_point_to_index(Point::new(x, y)) {
                 self.map.tiles[index as usize] = TileType::Floor;
             }
+        }
+    }
+}
+
+impl Default for MapBuilder {
+    fn default() -> Self {
+        MapBuilder {
+            map: Map::new(),
+            rooms: Vec::new(),
+            monster_spawns: Vec::new(),
+            player_start: Point::zero(),
+            amulet_position: Point::zero(),
         }
     }
 }

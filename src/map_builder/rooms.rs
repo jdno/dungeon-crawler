@@ -1,20 +1,12 @@
-use bracket_lib::prelude::*;
-
 use crate::map::TileType;
 use crate::map_builder::MapArchitect;
-use crate::{Map, MapBuilder, RandomNumberGenerator};
+use crate::{MapBuilder, RandomNumberGenerator};
 
 pub struct RoomsArchitect {}
 
 impl MapArchitect for RoomsArchitect {
     fn build(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder {
-        let mut builder = MapBuilder {
-            map: Map::new(),
-            rooms: Vec::new(),
-            monster_spawns: Vec::new(),
-            player_start: Point::zero(),
-            amulet_position: Point::zero(),
-        };
+        let mut builder = MapBuilder::default();
 
         builder.fill(TileType::Wall);
         builder.generate_random_rooms(rng);
