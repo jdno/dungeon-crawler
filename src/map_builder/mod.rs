@@ -2,13 +2,17 @@ use std::cmp::{max, min};
 
 use bracket_lib::prelude::*;
 
-use crate::map::{point_to_index, try_point_to_index, Map, TileType, MAP_HEIGHT, MAP_WIDTH};
+use crate::map::{
+    coordinate_to_index, point_to_index, try_point_to_index, Map, TileType, MAP_HEIGHT, MAP_WIDTH,
+};
 
 pub use self::automata::*;
+pub use self::drunkard::*;
 pub use self::empty::*;
 pub use self::rooms::*;
 
 mod automata;
+mod drunkard;
 mod empty;
 mod rooms;
 
@@ -29,7 +33,7 @@ pub struct MapBuilder {
 
 impl MapBuilder {
     pub fn new(rng: &mut RandomNumberGenerator) -> Self {
-        let mut architect = CellularAutomataArchitect {};
+        let mut architect = DrunkardsWalkArchitect {};
         architect.build(rng)
     }
 
@@ -83,6 +87,16 @@ impl MapBuilder {
         }
 
         spawns
+    }
+
+    fn wall_map(&mut self) {
+        for y in 0..MAP_HEIGHT {
+            for x in 0..MAP_WIDTH {
+                if x % (MAP_WIDTH - 1) == 0 || y % (MAP_HEIGHT - 1) == 0 {
+                    self.map.tiles[coordinate_to_index(x, y)] = TileType::Wall;
+                }
+            }
+        }
     }
 
     fn generate_random_rooms(&mut self, rng: &mut RandomNumberGenerator) {
