@@ -2,14 +2,20 @@ use std::cmp::{max, min};
 
 use bracket_lib::prelude::*;
 
-use crate::map::{point_to_index, try_point_to_index, Map, TileType, MAP_HEIGHT, MAP_WIDTH};
+use crate::map::{
+    coordinate_to_index, point_to_index, try_point_to_index, Map, TileType, MAP_HEIGHT, MAP_WIDTH,
+};
+use crate::map_builder::prefabs::apply_prefab;
 
 pub use self::automata::*;
+pub use self::drunkard::*;
 pub use self::empty::*;
 pub use self::rooms::*;
 
 mod automata;
+mod drunkard;
 mod empty;
+mod prefabs;
 mod rooms;
 
 const NUM_MONSTERS: usize = 50;
@@ -29,8 +35,16 @@ pub struct MapBuilder {
 
 impl MapBuilder {
     pub fn new(rng: &mut RandomNumberGenerator) -> Self {
-        let mut architect = CellularAutomataArchitect {};
-        architect.build(rng)
+        let mut architect: Box<dyn MapArchitect> = match rng.range(0, 3) {
+            0 => Box::new(DrunkardsWalkArchitect {}),
+            1 => Box::new(RoomsArchitect {}),
+            _ => Box::new(CellularAutomataArchitect {}),
+        };
+
+        let mut builder = architect.build(rng);
+        apply_prefab(&mut builder, rng);
+
+        builder
     }
 
     fn fill(&mut self, tile: TileType) {
@@ -83,6 +97,16 @@ impl MapBuilder {
         }
 
         spawns
+    }
+
+    fn wall_map(&mut self) {
+        for y in 0..MAP_HEIGHT {
+            for x in 0..MAP_WIDTH {
+                if x % (MAP_WIDTH - 1) == 0 || y % (MAP_HEIGHT - 1) == 0 {
+                    self.map.tiles[coordinate_to_index(x, y)] = TileType::Wall;
+                }
+            }
+        }
     }
 
     fn generate_random_rooms(&mut self, rng: &mut RandomNumberGenerator) {

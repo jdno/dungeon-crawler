@@ -89,6 +89,10 @@ pub fn coordinate_to_index(x: i32, y: i32) -> usize {
     ((y * MAP_WIDTH) + x) as usize
 }
 
+pub fn map_center() -> Point {
+    Point::new(MAP_WIDTH / 2, MAP_HEIGHT / 2)
+}
+
 pub fn point_to_index(point: Point) -> usize {
     coordinate_to_index(point.x, point.y)
 }
