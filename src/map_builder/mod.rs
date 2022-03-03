@@ -5,6 +5,7 @@ use bracket_lib::prelude::*;
 use crate::map::{
     coordinate_to_index, point_to_index, try_point_to_index, Map, TileType, MAP_HEIGHT, MAP_WIDTH,
 };
+use crate::map_builder::prefabs::apply_prefab;
 
 pub use self::automata::*;
 pub use self::drunkard::*;
@@ -14,6 +15,7 @@ pub use self::rooms::*;
 mod automata;
 mod drunkard;
 mod empty;
+mod prefabs;
 mod rooms;
 
 const NUM_MONSTERS: usize = 50;
@@ -39,7 +41,10 @@ impl MapBuilder {
             _ => Box::new(CellularAutomataArchitect {}),
         };
 
-        architect.build(rng)
+        let mut builder = architect.build(rng);
+        apply_prefab(&mut builder, rng);
+
+        builder
     }
 
     fn fill(&mut self, tile: TileType) {
